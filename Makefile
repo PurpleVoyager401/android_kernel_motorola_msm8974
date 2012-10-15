@@ -125,7 +125,7 @@ $(if $(KBUILD_OUTPUT),, \
 PHONY += $(MAKECMDGOALS) sub-make
 
 $(filter-out _all sub-make $(CURDIR)/Makefile, $(MAKECMDGOALS)) _all: sub-make
-	$(Q)@:
+	@:
 
 # KBUILD_RELSRC is the relative path from output to source; this was added so
 # that the absolute path to source files wouldn't get encoded in vmlinux and
