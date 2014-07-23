@@ -2638,7 +2638,11 @@ const struct inode_operations ext4_dir_inode_operations = {
 	.mkdir		= ext4_mkdir,
 	.rmdir		= ext4_rmdir,
 	.mknod		= ext4_mknod,
+<<<<<<< HEAD
 	.rename		= ext4_rename,
+=======
+	.tmpfile	= ext4_tmpfile,
+>>>>>>> c960d0bb480 (BACKPORT: fs: call rename2 if exists)
 	.rename2	= ext4_rename2,
 	.setattr	= ext4_setattr,
 #ifdef CONFIG_EXT4_FS_XATTR
