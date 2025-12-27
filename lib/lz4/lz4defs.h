@@ -3,7 +3,7 @@
 
 /*
  * lz4defs.h -- common and architecture specific defines for the kernel usage
-
+ *
  * LZ4 - Fast LZ compression algorithm
  * Copyright (C) 2011-2016, Yann Collet.
  * BSD 2-Clause License (http://www.opensource.org/licenses/bsd-license.php)
@@ -34,6 +34,8 @@
  *	Changed for kernel usage by:
  *	Sven Schmidt <4sschmid@informatik.uni-hamburg.de>
  */
+
+#include <linux/bitops.h>
 
 #include <asm/unaligned.h>
 #include <linux/string.h>	 /* memset, memcpy */
@@ -139,17 +141,17 @@ static FORCE_INLINE void LZ4_writeLE16(void *memPtr, U16 value)
 
 static FORCE_INLINE void LZ4_copy8(void *dst, const void *src)
 {
-#if LZ4_ARCH64
+	#if LZ4_ARCH64
 	U64 a = get_unaligned((const U64 *)src);
 
 	put_unaligned(a, (U64 *)dst);
-#else
+	#else
 	U32 a = get_unaligned((const U32 *)src);
 	U32 b = get_unaligned((const U32 *)src + 1);
 
 	put_unaligned(a, (U32 *)dst);
 	put_unaligned(b, (U32 *)dst + 1);
-#endif
+	#endif
 }
 
 /*
@@ -157,7 +159,7 @@ static FORCE_INLINE void LZ4_copy8(void *dst, const void *src)
  * which can overwrite up to 7 bytes beyond dstEnd
  */
 static FORCE_INLINE void LZ4_wildCopy(void *dstPtr,
-	const void *srcPtr, void *dstEnd)
+									  const void *srcPtr, void *dstEnd)
 {
 	BYTE *d = (BYTE *)dstPtr;
 	const BYTE *s = (const BYTE *)srcPtr;
@@ -172,11 +174,11 @@ static FORCE_INLINE void LZ4_wildCopy(void *dstPtr,
 
 static FORCE_INLINE unsigned int LZ4_NbCommonBytes(register size_t val)
 {
-#if LZ4_LITTLE_ENDIAN
+	#if LZ4_LITTLE_ENDIAN
 	return __ffs(val) >> 3;
-#else
+	#else
 	return (BITS_PER_LONG - 1 - __fls(val)) >> 3;
-#endif
+	#endif
 }
 
 static FORCE_INLINE unsigned int LZ4_count(
@@ -200,22 +202,22 @@ static FORCE_INLINE unsigned int LZ4_count(
 		return (unsigned int)(pIn - pStart);
 	}
 
-#if LZ4_ARCH64
+	#if LZ4_ARCH64
 	if ((pIn < (pInLimit - 3))
 		&& (LZ4_read32(pMatch) == LZ4_read32(pIn))) {
 		pIn += 4;
-		pMatch += 4;
-	}
-#endif
+	pMatch += 4;
+		}
+		#endif
 
-	if ((pIn < (pInLimit - 1))
-		&& (LZ4_read16(pMatch) == LZ4_read16(pIn))) {
-		pIn += 2;
+		if ((pIn < (pInLimit - 1))
+			&& (LZ4_read16(pMatch) == LZ4_read16(pIn))) {
+			pIn += 2;
 		pMatch += 2;
-	}
+			}
 
-	if ((pIn < pInLimit) && (*pMatch == *pIn))
-		pIn++;
+			if ((pIn < pInLimit) && (*pMatch == *pIn))
+				pIn++;
 
 	return (unsigned int)(pIn - pStart);
 }
